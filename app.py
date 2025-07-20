@@ -17,7 +17,7 @@ if uploaded_file:
         devices = devices_data.get("devices", [])
         st.success(f"{len(devices)} device(s) loaded.")
 
-        if st.button("🔍 Run Scan"):
+        if st.button("Run Scan"):
             results = []
 
             for device in devices:
