@@ -2,13 +2,18 @@ import streamlit as st
 import yaml
 import socket
 from netmiko import ConnectHandler
-import platform
 import pandas as pd
 
 st.set_page_config(page_title="Network Device Info Collector", layout="wide")
 st.title("Network Device Info Collector")
 
-st.write("Upload a `devices.yaml` file to start scanning devices.")
+st.markdown("""
+Upload a `devices.yaml` file and click **Run Scan** to collect:
+- Hostname
+- OS/Version
+- Uptime (if available)
+""")
+
 uploaded_file = st.file_uploader("Upload your devices.yaml", type=["yaml", "yml"])
 
 if uploaded_file:
@@ -33,10 +38,10 @@ if uploaded_file:
                 os_version = ""
                 uptime = ""
 
-                st.write(f"Checking {name} ({ip})...")
+                st.write(f"Checking {name} at {ip}...")
 
                 try:
-                    sock = socket.create_connection((ip, port), timeout=2)
+                    sock = socket.create_connection((ip, port), timeout=3)
                     status = "UP"
                     sock.close()
                 except socket.error:
@@ -49,7 +54,7 @@ if uploaded_file:
                         "OS/Version": os_version,
                         "Uptime": uptime
                     })
-                    continue 
+                    continue
 
                 try:
                     ssh_info = {
