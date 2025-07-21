@@ -6,7 +6,12 @@ import csv
 import platform
 import os
 import pandas as pd
+import shutil
 
+if platform.system().lower() == "windows":
+    param = "-n"
+else:
+    param = "-c"
 st.set_page_config(page_title="Network Device Info Collector", layout="wide")
 st.title("Network Device Info Collector")
 
@@ -40,9 +45,11 @@ if devices and st.button("Run Scan"):
         uptime = ""
 
         st.write(f"Pinging {name} ({ip})...")
-
-        param = "-n" if platform.system().lower() == "windows" else "-c"
-        ping_result = subprocess.run(["ping", param, "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ping_path = shutil.which("ping")
+        if ping_path:
+            ping_result = subprocess.run([ping_path, param, "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        else:
+            st.error("Ping command not found in this environment.")
 
         if ping_result.returncode == 0:
             status = "UP"
