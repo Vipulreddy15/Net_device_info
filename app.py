@@ -3,7 +3,6 @@ import yaml
 import socket
 from netmiko import ConnectHandler
 import pandas as pd
-import platform
 
 st.set_page_config(page_title="Network Device Info Collector", layout="wide")
 st.title("Network Device Info Collector")
@@ -40,7 +39,6 @@ if devices and st.button("Run Scan"):
         st.write(f"Checking {name} ({ip})...")
 
         try:
-            # Check if device is reachable via socket (TCP port 22)
             sock = socket.create_connection((ip, port), timeout=3)
             sock.close()
             status = "UP"
@@ -54,7 +52,7 @@ if devices and st.button("Run Scan"):
                 "OS/Version": os_version,
                 "Uptime": uptime
             })
-            continue  # Skip SSH if not reachable
+            continue
 
         try:
             ssh_info = {
@@ -78,6 +76,7 @@ if devices and st.button("Run Scan"):
                         uptime = up.strip()
                     if "Cisco IOS Software" in line:
                         os_version = line.strip()
+
             conn.disconnect()
 
         except Exception as e:
