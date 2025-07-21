@@ -1,17 +1,10 @@
 import streamlit as st
 import yaml
-import subprocess
+import socket
 from netmiko import ConnectHandler
-import csv
-import platform
-import os
 import pandas as pd
-import shutil
+import platform
 
-if platform.system().lower() == "windows":
-    param = "-n"
-else:
-    param = "-c"
 st.set_page_config(page_title="Network Device Info Collector", layout="wide")
 st.title("Network Device Info Collector")
 
@@ -35,55 +28,60 @@ if devices and st.button("Run Scan"):
         name = device.get("name", "")
         ip = device.get("ip", "")
         username = device.get("username", "")
-        password = device.get("password", "")
+        password = str(device.get("password", ""))
         dtype = device.get("device_type", "")
-        port = device.get("port", 22)
+        port = int(device.get("port", 22))
 
         status = "DOWN"
         hostname = ""
         os_version = ""
         uptime = ""
 
-        st.write(f"Pinging {name} ({ip})...")
-        ping_path = shutil.which("ping")
-        if ping_path:
-            ping_result = subprocess.run([ping_path, param, "1", ip], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        else:
-            st.error("Ping command not found in this environment.")
+        st.write(f"Checking {name} ({ip})...")
 
-        if ping_result.returncode == 0:
+        try:
+            # Check if device is reachable via socket (TCP port 22)
+            sock = socket.create_connection((ip, port), timeout=3)
+            sock.close()
             status = "UP"
-
-            try:
-                ssh_info = {
-                    "device_type": dtype,
-                    "host": ip,
-                    "username": username,
-                    "password": password,
-                    "port": port
-                }
-                conn = ConnectHandler(**ssh_info)
-
-                if dtype == "linux":
-                    os_version = conn.send_command("uname -a")
-                    hostname = conn.send_command("hostname")
-                    uptime = conn.send_command("uptime -p")
-                elif dtype == "cisco_ios":
-                    output = conn.send_command("show version")
-                    for line in output.splitlines():
-                        if "uptime is" in line:
-                            hostname, up = line.split(" uptime is ")
-                            uptime = up.strip()
-                        if "Cisco IOS Software" in line:
-                            os_version = line.strip()
-
-                conn.disconnect()
-
-            except Exception as e:
-                st.error(f"SSH failed for {ip}: {e}")
-
-        else:
+        except socket.error:
             st.warning(f"{ip} is not reachable.")
+            results.append({
+                "Name": name,
+                "IP": ip,
+                "Status": status,
+                "Hostname": hostname,
+                "OS/Version": os_version,
+                "Uptime": uptime
+            })
+            continue  # Skip SSH if not reachable
+
+        try:
+            ssh_info = {
+                "device_type": dtype,
+                "host": ip,
+                "username": username,
+                "password": password,
+                "port": port
+            }
+            conn = ConnectHandler(**ssh_info)
+
+            if dtype == "linux":
+                os_version = conn.send_command("uname -a")
+                hostname = conn.send_command("hostname")
+                uptime = conn.send_command("uptime -p")
+            elif dtype == "cisco_ios":
+                output = conn.send_command("show version")
+                for line in output.splitlines():
+                    if "uptime is" in line:
+                        hostname, up = line.split(" uptime is ")
+                        uptime = up.strip()
+                    if "Cisco IOS Software" in line:
+                        os_version = line.strip()
+            conn.disconnect()
+
+        except Exception as e:
+            st.error(f"SSH failed for {ip}: {e}")
 
         results.append({
             "Name": name,
