@@ -92,3 +92,4 @@ Install manually:
 ------------------------------------------------------------
 Vipul Reddy Gundalu  
 GitHub: https://github.com/Vipulreddy15
+LinkedIn: https://www.linkedin.com/in/vipul-reddy-gundalu-1533742b1/
