@@ -4,7 +4,7 @@ A Streamlit-based tool to scan and collect information from multiple network dev
 Supports Linux and Cisco IOS devices, with results downloadable in CSV format.
 
 ------------------------------------------------------------
-📌 Features
+Features
 ------------------------------------------------------------
 - Upload a `devices.yaml` file containing device details
 - Automatically ping devices to check connectivity
@@ -18,7 +18,7 @@ Supports Linux and Cisco IOS devices, with results downloadable in CSV format.
 - Works with Linux and Cisco IOS devices
 
 ------------------------------------------------------------
-📂 Project Structure
+Project Structure
 ------------------------------------------------------------
 Net_device_info/
 │
@@ -42,7 +42,7 @@ Net_device_info/
    pip install -r requirements.txt
 
 ------------------------------------------------------------
-📄 devices.yaml Format
+devices.yaml Format
 ------------------------------------------------------------
 Example:
 devices:
@@ -60,7 +60,7 @@ devices:
     port: 22
 
 ------------------------------------------------------------
-🚀 Usage
+Usage
 ------------------------------------------------------------
 1. Run the Streamlit app:
    streamlit run app.py
@@ -77,7 +77,7 @@ devices:
 5. Download results as device_info.csv.
 
 ------------------------------------------------------------
-🛠 Dependencies
+Dependencies
 ------------------------------------------------------------
 - Streamlit – Web interface
 - PyYAML – Reading YAML device configs
@@ -88,7 +88,7 @@ Install manually:
    pip install streamlit pyyaml netmiko pandas
 
 ------------------------------------------------------------
-👤 Author
+Author
 ------------------------------------------------------------
 Vipul Reddy Gundalu  
 GitHub: https://github.com/Vipulreddy15
